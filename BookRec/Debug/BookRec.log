@@ -1,0 +1,7 @@
+﻿  BookRec.cpp
+C:\Users\nylan\bookRec\Book-Recommender\BookRec\BookRec\BookRec.cpp(141,22): warning C4018: '<': signed/unsigned mismatch
+C:\Users\nylan\bookRec\Book-Recommender\BookRec\BookRec\BookRec.cpp(160,22): warning C4018: '<': signed/unsigned mismatch
+C:\Users\nylan\bookRec\Book-Recommender\BookRec\BookRec\BookRec.cpp(178,21): warning C4018: '<': signed/unsigned mismatch
+C:\Users\nylan\bookRec\Book-Recommender\BookRec\BookRec\BookRec.cpp(179,22): warning C4018: '<': signed/unsigned mismatch
+C:\Users\nylan\bookRec\Book-Recommender\BookRec\BookRec\BookRec.cpp(230,21): warning C4018: '<': signed/unsigned mismatch
+  BookRec.vcxproj -> C:\Users\nylan\bookRec\Book-Recommender\BookRec\Debug\BookRec.exe

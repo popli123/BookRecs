@@ -253,7 +253,6 @@ int main()
 		cout << "The first dataset is complete" << endl;
 
 		map<string, vector<pair<Book, int>>> list = edgeCreation(authorGraph, books);
-		printEdgeList(list);
 
 
 

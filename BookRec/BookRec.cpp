@@ -7,29 +7,25 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include "BookRec.h"
+#include "Book.h"
+
 using namespace std;
 
+BookRec::BookRec()
+{
 
-class Book {
-	string name;
-	string author;
-	string publisher;
-	int publishYear;
-	double rating;
+	string filePath = "book1-100k2.txt";
+	GetDataFromFile1(filePath);
 
-public:
-	Book(string bookName, string bookAuthor, string bookPublisher, int bookYear, double bookRating);
-	string GetName();
-	string GetAuthor();
-	string GetPublisher();
-	int GetPublishYear();
-	double GetRating();
-	bool operator==(const Book& rhs) const;
-};
+	filePath = "book100k-200k.txt";
+	GetDataFromFile2(filePath);
 
+	this->list = edgeCreation();
+}
 
-void GetDataFromFile1(string filePath, map<string, vector<Book>>& authorGraph, map<string, vector<Book>>& publisherGraph, vector<Book>& books) {
-
+void BookRec::GetDataFromFile1(string filePath)
+{
 	ifstream inFile(filePath);
 
 	if (inFile.is_open()) {
@@ -66,9 +62,9 @@ void GetDataFromFile1(string filePath, map<string, vector<Book>>& authorGraph, m
 
 
 			Book book(name, author, publisher, publishYear, rating);
-			authorGraph[author].push_back(book);
-			publisherGraph[publisher.substr(0, publisher.find(' '))].push_back(book);
-			books.push_back(book);
+			this->authorGraph[author].push_back(book);
+			this->publisherGraph[publisher.substr(0, publisher.find(' '))].push_back(book);
+			this->books.push_back(book);
 		}
 
 	}
@@ -77,11 +73,10 @@ void GetDataFromFile1(string filePath, map<string, vector<Book>>& authorGraph, m
 	}
 
 
-
 }
 
-void GetDataFromFile2(string filePath, map<string, vector<Book>>& authorGraph, map<string, vector<Book>>& publisherGraph) {
-
+void BookRec::GetDataFromFile2(string filePath)
+{
 	ifstream inFile(filePath);
 
 	if (inFile.is_open()) {
@@ -118,8 +113,8 @@ void GetDataFromFile2(string filePath, map<string, vector<Book>>& authorGraph, m
 
 
 			Book book(name, author, publisher, publishYear, rating);
-			authorGraph[author].push_back(book);
-			publisherGraph[publisher.substr(0, publisher.find(' '))].push_back(book);
+			this->authorGraph[author].push_back(book);
+			this->publisherGraph[publisher.substr(0, publisher.find(' '))].push_back(book);
 
 		}
 
@@ -128,176 +123,37 @@ void GetDataFromFile2(string filePath, map<string, vector<Book>>& authorGraph, m
 		cout << "file wont open " << filePath << endl;
 	}
 
-
-
 }
 
-void SearchForAuthor(string match, map<string, vector<Book>>& authorGraph) {
-	map<string, vector<Book>>::iterator iter;
-	bool found = false;
-	for (iter = authorGraph.begin(); iter != authorGraph.end(); iter++) {
-		if (iter->first == match) {
-			cout << match << ": ";
-			for (int i = 0; i < iter->second.size(); i++) {
-				cout << iter->second[i].GetName()<< " " << endl;
-				found = true;
-			}
-		}
-	}
-	if (found == false)
-	{
-		cout << "No match found for " << match << endl;
-	}
-
-}
-
-void SearchForPublisher(string match, map<string, vector<Book>>& publisherGraph) {
-	map<string, vector<Book>>::iterator iter;
-	bool found = false;
-	for (iter = publisherGraph.begin(); iter != publisherGraph.end(); iter++) {
-		if (iter->first == match) {
-			cout << match << ": ";
-			for (int i = 0; i < iter->second.size(); i++) {
-				cout << iter->second[i].GetName() << " " << endl;
-				found = true;
-			}
-		}
-	}
-	if (found == false)
-	{
-		cout << "No match found for " << match << endl;
-	}
-
-}
-
-map<string, vector<pair<Book, int>>> edgeCreation(map<string, vector<Book>> authorGraph, vector<Book> books) {
-	
+map<string, vector<pair<Book, int>>> BookRec::edgeCreation()
+{
 	map<string, vector<pair<Book, int>>> adjacencyList;
 
-	for (auto itr = authorGraph.begin(); itr != authorGraph.end(); itr++) {
+	for (auto itr = this->authorGraph.begin(); itr != this->authorGraph.end(); itr++) {
 		for (int i = 0; i < itr->second.size(); i++) {
 			for (int j = 0; j < itr->second.size(); j++) {
-				if (books[i].GetName() == books[j].GetName()) {
+				if (itr->second[i].GetName() == itr->second[j].GetName()) {
 					continue;
 				}
 				int weight = 3;
-				if (books[i].GetAuthor() == books[j].GetAuthor()) {
+				if (itr->second[i].GetAuthor() == itr->second[j].GetAuthor()) {
 					weight--;
 				}
-				if (books[i].GetPublisher() == books[j].GetPublisher()) {
+				if (itr->second[i].GetPublisher() == itr->second[j].GetPublisher()) {
 					weight--;
 				}
 				if (weight != 3) {
-					adjacencyList[books[i].GetName()].push_back(make_pair(books[j], weight));
+					adjacencyList[itr->second[i].GetName()].push_back(make_pair(itr->second[j], weight));
 				}
 			}
 		}
 	}
-
-	/*
-	for (int i = 0; i < books.size(); i++) {
-		for (int j = 0; j < books.size(); j++) {
-			if (books[i].GetName() == books[j].GetName()) {
-				continue;
-			}
-			int weight = 3;
-			if (books[i].GetAuthor() == books[j].GetAuthor()) {
-				weight--;
-			}
-			if (books[i].GetPublisher() == books[j].GetPublisher()) {
-				weight--;
-			}
-			if (weight != 3) {
-				adjacencyList[books[i].GetName()].push_back(make_pair(books[j], weight));
-			}
-			
-		}
-	}
-	*/
-
 
 
 	return adjacencyList;
 }
 
-void printEdgeList(map<string, vector<pair<Book, int>>> list) {
-	int i = 0;
-	for (auto itr = list.begin(); itr != list.end(); itr++) {
-		if (i == 25) {
-			break;
-		}
-		cout << itr->first << ": ";
-		for (int j = 0; j < itr->second.size(); j++) {
-			cout << itr->second[j].second << " ";
-		}
-		cout << endl;
-		i++;
-	}
-}
-
-int main()
-{
-	cout << "program starting" << endl;
-
-
-		map<string, vector<Book>> authorGraph;
-		map<string, vector<Book>> publisherGraph;
-		vector<Book> books;
-
-		string filePath = "book1-100k2.txt";
-		GetDataFromFile1(filePath, authorGraph, publisherGraph, books);
-
-		filePath = "book100k-200k.txt";
-		GetDataFromFile2(filePath, authorGraph, publisherGraph);
-
-		cout << "The first dataset is complete" << endl;
-
-		map<string, vector<pair<Book, int>>> list = edgeCreation(authorGraph, books);
 
 
 
-	return 0;
-}
-
-Book::Book(string bookName, string bookAuthor, string bookPublisher, int bookYear, double bookRating)
-{
-	name = bookName;
-	author = bookAuthor;
-	publisher = bookPublisher;
-	publishYear = bookYear;
-	rating = bookRating;
-}
-
-string Book::GetName()
-{
-	return name;
-}
-
-string Book::GetAuthor()
-{
-	return author;
-}
-
-string Book::GetPublisher()
-{
-	return publisher;
-}
-
-int Book::GetPublishYear()
-{
-	return publishYear;
-}
-
-double Book::GetRating()
-{
-	return rating;
-}
-
-bool Book::operator==(const Book& rhs) const
-{
-	if (rhs.name == this->name) {
-		return true;
-	}
-	return false;
-}
 
